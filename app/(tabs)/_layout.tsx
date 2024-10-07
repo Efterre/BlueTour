@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Image } from 'react-native'
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
@@ -30,6 +31,23 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name = "signin"
+        options= {{
+          title : 'Sign In',
+          tabBarIcon: ({color, focused}) => (
+            <Image 
+              source = {
+                focused 
+                  ? require('./../../assets/images/user.png')
+                  : require('./../../assets/images/user.png')
+              } 
+              style={{ width: 24, height: 24, tintColor: color }}
+              resizeMode="contain"
+            />
+          )
         }}
       />
     </Tabs>
