@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Image, StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -352,3 +353,45 @@ const styles = StyleSheet.create({
 });
 
 
+=======
+import { Image, StyleSheet, Platform , Text , View , Button , ScrollView , TouchableOpacity, TextInput, Modal, FlatList } from 'react-native';
+import React , {Component, useState} from 'react';
+import LogIn from './LogIn';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function Settings() {
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const openModal = () => setModalVisible(true);  // Modal açma fonksiyonu
+    const closeModal = () => setModalVisible(false); // Modal kapatma fonksiyonu
+  
+
+    
+    return (
+        <SafeAreaView>
+            <View>
+                <Button title="Log In" onPress={openModal} />
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isModalVisible}
+                    onRequestClose={closeModal} 
+                >
+                    <View style={styles.modalContainer}>
+                        <LogIn closeModal={closeModal} /> 
+                    </View>
+                </Modal>
+            </View>
+        </SafeAreaView>
+    );
+};
+
+const styles = StyleSheet.create({
+    modalContainer:{
+        flex: 1,
+        backgroundColor: 'rgb(255, 255, 255)', // Arka planı saydam yapıyoruz
+    },
+});
+
+
+>>>>>>> 1cb0f61753bad1140174d9777c72c9ea3969fc55
