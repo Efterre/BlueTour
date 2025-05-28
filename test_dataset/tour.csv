@@ -1,0 +1,5 @@
+﻿boatregistrationnumber,tourname,isdivingtour,isfishingtour,isdailytour,isovernighttour,isspecialtour,capacity,foodstate,isavaliable,foodpriceperperson,foodprice,description,countyid
+100000001,Çingenem Datça Gezi Turu,false,true,false,false,true,10,true,true,100,1000,Doğayla iç içe bir gezi turu,2
+100000002,Dem Baba Bozyazı Yelken Turu,false,false,true,true,true,12,true,true,150,1800,Yelkenliyle deniz turu,7
+100000003,Eyşan Kemer Balık Turu,true,false,false,false,true,8,true,true,120,960,Balık tutma deneyimi,1
+100000004,İspanyol Marmaris Gece Turu,false,false,true,true,true,15,true,true,200,3000,Gece deniz turu,3

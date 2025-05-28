@@ -1,0 +1,5 @@
+﻿registrationnumber,captainid,boatname,boattypeid,manufacturematerial,taxnumber,taxoffice,boundport
+100000001,2,Çingenem,2,2,2345678901,Muğla Merkez,Datça
+100000002,7,Dem Baba,5,1,2345678902,Mersin,Bozyazı
+100000003,8,Eyşan,6,3,2345678903,Antalya Merkez,Kemer
+100000004,10,İspanyol,4,4,2345678904,İzmir,Marmaris

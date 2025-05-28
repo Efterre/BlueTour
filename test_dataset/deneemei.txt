@@ -1,0 +1,16 @@
+cityid,cityname
+1,Antalya
+2,Muğla
+3,İzmir
+4,Aydın
+5,Balıkesir
+6,Çanakkale
+7,Mersin
+8,Hatay
+9,İstanbul
+10,Bursa
+11,Yalova
+12,Tekirdağ
+13,Kocaeli
+14,Edirne
+15,Düzce

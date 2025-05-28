@@ -1,0 +1,9 @@
+﻿plantourid,tourtype,tourcapacity,defaultstarttime,defaultendtime,tourprice,feeunit
+100000001,daily,10,08:00:00,12:00:00,1500,TRY
+100000001,daily,8,14:00:00,18:00:00,1400,EUR
+100000002,overnight,12,20:00:00,08:00:00,2500,USD
+100000002,special,10,19:00:00,23:00:00,3000,TRY
+100000003,fishing,6,06:00:00,10:00:00,1200,EUR
+100000003,fishing,8,16:00:00,20:00:00,1500,TRY
+100000004,overnight,15,22:00:00,06:00:00,3500,USD
+100000004,special,12,21:00:00,01:00:00,2800,TRY

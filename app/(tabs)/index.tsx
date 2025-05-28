@@ -1,103 +1,127 @@
-import { Image, StyleSheet, Platform , Text , View , Button , ScrollView , TouchableOpacity, TextInput } from 'react-native';
-import React , {Component, useState} from 'react';
-import Filtre from '../../Filtre.js';
+import React, { useEffect, useState } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-gesture-handler';
+import Modal from 'react-native-modal';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlatList } from 'react-native-gesture-handler';
+import HomeScreen from './../../homeScreen';
+import CaptainHomeScreen from './../../captainHomeScreen';
+import Settings from './../../settings';
+import TourPage from './../../TourPage';
+import ListAds from './../../modules/listads';
+import FavoriteTour from './../../FavoriteTour';
+import PastTour from './../../PastTour';
+import LoginScreen from './../../LogIn';
+import SignupScreen from './../../SignUpScreen';
+import TourCreation from './../../TourCreation';
+import Maps from './../../maps';
+import { Text, View, FlatList, TextInput } from 'react-native';
 
-export default function HomeScreen() {
-  
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const handleSearch = () => {
-    // Arama işlemini yap
-    console.log('Aranan :', searchText);
-  };
-  
 
-  return (
-    <SafeAreaView style = {styles.safeAreaHome}>
-      <View style = {styles.adView}>
-        
-        {/* <Image source = {require('../../../assets/images/picture.png')} 
-          style = {{width : 200 , height : 70}}
-        />  */}
 
-        <Text>Here is an ad area of a tour boat or yachts</Text>
+const Stack = createNativeStackNavigator();
 
-      </View>
-
-      <View style = {styles.SearchBar}> 
-          <TouchableOpacity
-            onPress = { () => setIsFilterVisible(!isFilterVisible)} >
-              <Image source = {require('../../assets/images/filter-list.png')} 
-              style={styles.SearchBarIcon}
-              />
-
-          </TouchableOpacity>
-          <TextInput
-            style = {styles.searchInput}
-            placeholder='Type Tour Name'
-            value = {searchText}
-            onChangeText={(text) => setSearchText(text)}
-          />
-          <TouchableOpacity
-            onPress= {handleSearch} >
-              <Image source = {require('../../assets/images/search.png')} 
-              style={styles.SearchBarIcon}
-              />
-          </TouchableOpacity>
-
-      </View>
-      {isFilterVisible && (
-        <ScrollView style={styles.filtreBox}>
-          <Filtre />
-        </ScrollView>
-      )}
-      
-
-    </SafeAreaView>
-  );
+// userSession state tipini tanımlayalım
+interface UserSession {
+  userId: string;
+  userType: number;
+  username: string;
+  email: string;
+  captainDetails: any;
 }
 
-const styles = StyleSheet.create({
-  safeAreaHome : {
-    backgroundColor : 'white',
-    flex : 1,  
-  } ,
 
-  adView : {
-    backgroundColor : 'grey',
-    flex : 0.08, 
-  } ,
+const Index = () => {
+  const [userSession, setUserSession] = useState<UserSession | null>(null);
 
-  SearchBar : {
-    flexDirection : 'row',
-    alignItems : 'center',
-    marginHorizontal : 20,
-    marginVertical: 24
-  } ,
+  useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const sessionData = await AsyncStorage.getItem('userSession');
+        
+        if (sessionData) {
+          setUserSession(JSON.parse(sessionData));
+          
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      }
+    };
+    
+    checkUserSession();
+  }, []);
+ 
+  return (
+    <Stack.Navigator initialRouteName={userSession ? (userSession.userType === 1 ? 'CaptainHome' : 'Home') : 'Login'}>
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Signup" 
+        component={SignupScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ headerShown: false }} 
+        initialParams={{ userType: 0 }} 
+      />
 
-  SearchBarIcon: {
-    width: 24, height: 24,
-    marginRight : 10
-  },
-  
-  searchInput : {
-    flex : 1,
-    height : 40,
-    borderColor: '#089CFF',
-    borderWidth : 1,
-    borderRadius : 5,
-    paddingHorizontal : 10
-  } ,
+      <Stack.Screen 
+        name="CaptainHome" 
+        component={CaptainHomeScreen} 
+        options={{ headerShown: false }} 
+        initialParams={{ 
+          userType: 1,
+          captainId: userSession?.userId 
+        }}
+      />
+      
+      <Stack.Screen 
+        name="TourCreation" 
+        component={TourCreation} 
+        options={{ headerShown: false }} 
+        initialParams={{ 
+          captainId: userSession?.userId 
+        }}
+      />
 
-  filtreBox: {
-    backgroundColor: 'lightblue',
-    padding: 10,
-    borderRadius: 10,
-    margin: 20,
-  },
-
-
-});
+      <Stack.Screen 
+        name="Settings" 
+        component={Settings} 
+        options={{ headerShown: false }} 
+        initialParams={{ userType: userSession?.userType }} 
+      />
+      <Stack.Screen 
+        name="TourPage" 
+        component={TourPage} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="ListAds" 
+        component={ListAds} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="FavoriteTour" 
+        component={FavoriteTour} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="PastTour" 
+        component={PastTour} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen
+        name = "Mymap"
+        component={Maps}
+        options={{ headerShown: false }} 
+      />
+      
+    </Stack.Navigator>
+  );
+}
+export default Index;

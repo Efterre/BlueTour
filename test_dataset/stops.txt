@@ -1,0 +1,20 @@
+id,name,location,latitude,longitude,type
+1,İncirli Island,İncirlinin Koyu,39.345377,26.591278,1
+2,Karaada Island,Akvaryum Koyu,39.33482,26.57436,1
+3,Melina Island,Mercan Koyu,39.33617,26.56092,2
+4,Cunda Island,Ortunç Koyu,39.33485,26.61739,1
+5,İncirli Island,,39.344199,26.596477,1
+6,Hasırcık Island,,39.351596,26.599692,1
+7,İncirli Island,,39.348664,26.591564,1
+8,Yelken Island,,39.353274,26.589274,2
+9,Yalnız Island,,39.358324,26.590419,2
+10,Karaada Island,Killi Koy,39.33589,26.57699,1
+11,Karaada Island,,39.34160,26.57938,1
+12,Karaada Island,Yeşilkoy,39.33822,26.57513,1
+13,Karaada Island,,39.34241,26.57624,1
+14,Melina Island,Yuvarlak Ada,39.336564,26.561951,1
+15,İlyosta Island,Güneş Ada,39.33019,26.53704,1
+16,Büyük Maden Island,Maden Ada,39.37652,26.58337,1
+17,Küçük Maden Island,Küçük Madan Adası,39.37990,26.57497,1
+18,Mosko Island,Taşlı Koy,39.33443,26.59752,1
+19,Mosko Island,Pınar Ada,39.33430,26.61371,1

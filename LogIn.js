@@ -1,97 +1,289 @@
-import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth } from './firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-class LogIn extends Component {
-    state = {
-        email : '',
-        phone : '' ,
-        password: '',
-        numberOfCertificateOfRegistry : '' ,
-        numberOfTaxCertificate : '',
-        boatName : '' ,
-        typeOfTour : '' ,
-        lengthOfBoat : '',
-        widthOfBoat : '' ,
-        capacity : '' ,
-        location : '' ,
-        beginningTimeS : '',
-        endingTimeS : '' ,
-        availableDates : '' ,
-        availableTimeInterval : '',
-        foodSitutation : '',
-        stopNumber : '',
-        stopLocation : '' ,
-        fee : '' ,
-        feeEachPerson : '' 
-    }
-    handleEmail = (text) => {
-        this.setState({ email: text })
-    }
-    handlePhone = (text) => {
-        this.setState({phone : text})
-    }
-    handlePassword = (text) => {
-        this.setState({ password: text })
-    }
-    login = (email, pass) => {
-        alert('email or phone number: ' + email + ' password: ' + pass)
-    }
-    render() {
-        return (
-            <View style = {styles.container}>
-                <TextInput style = {styles.input}
-                underlineColorAndroid = "transparent"
-                placeholder = "Email"
-                placeholderTextColor = "#9a73ef"
-                autoCapitalize = "none"
-                onChangeText = {this.handleEmail}/>
+export default function LoginScreen({ navigation }) {
+  const apiurl = "apiurl";
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-                <TextInput style = {styles.input}
-                underlineColorAndroid = "transparent"
-                placeholder = "phone"
-                placeholderTextColor = "#9a73ef"
-                autoCapitalize = "none"
-                onChangeText = {this.handlePhone}/>
+  const handleLogin = async () => {
+    try {
+      
+      const response = await fetch(`${apiurl}/api/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ useremail: email, userpassword: password }),
+      });
+      
+      const data = await response.json();
+      console.log("data : ", data);
 
-                <TextInput style = {styles.input}
-                underlineColorAndroid = "transparent"
-                placeholder = "Password"
-                placeholderTextColor = "#9a73ef"
-                autoCapitalize = "none"
-                onChangeText = {this.handlePassword}/>
-                
-                <TouchableOpacity
-                style = {styles.submitButton}
-                onPress = {
-                    () => this.login(this.state.email , this.state.phone, this.state.password)
-                }>
+      if (response.ok && data.success) {
+        const userData = {
+          userId: data.user.userid,
+          userType: data.user.usertype,
+          username: data.user.username,
+          email: data.user.email,
+          captainDetails: data.user.captainDetails
+        };
+        await AsyncStorage.setItem('userSession', JSON.stringify(userData));
+        console.log(userData);
+        console.log("data uid : ",data.user.userid);
+        
+        navigation.reset({
+          index: 0,
+          routes: [{ 
+            name: data.user.usertype === 1 ? 'CaptainHome' : 'Home',
+            params: { 
+              userType: data.user.usertype === 1 ? 1 : 0,
+              captainId: data.user.userid
+            }
+          }],
+        });
+        
+      } else {
+        alert('Giriş başarısız: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(error.message);
+    }
+  };
 
-                <Text style = {styles.submitButtonText}> Submit </Text>
-                </TouchableOpacity>
+  const handleGuestLogin = () => {
+    global.isGuestUser = true;
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Home', params: { userType: 'guestuser' } }],
+    });
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      alert('Şifre sıfırlama linki e-posta adresinize gönderildi.');
+      setIsForgotPasswordVisible(false);
+    } catch (error) {
+      alert('Hata: ' + error.message);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('./assets/images/user.png')}
+          style={styles.logoImage}
+        />
+      </View>
+
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
+          <TextInput 
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput 
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity 
+            style={styles.passwordVisibilityButton}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Image 
+              source={showPassword ? require('./assets/images/look_eye.png') : require('./assets/images/no_look_eye.png')} 
+              style={styles.eyeIcon}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Giriş Yap</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.guestButton} 
+          onPress={handleGuestLogin}
+        >
+          <Text style={styles.guestButtonText}>Misafir Olarak Devam Et</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.signupLink}
+          onPress={() => navigation.navigate('Signup')}
+        >
+          <Text style={styles.signupText}>Hesabın yok mu? Kayıt ol</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.forgotPasswordLink}
+          onPress={() => setIsForgotPasswordVisible(true)}
+        >
+          <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={isForgotPasswordVisible}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.forgotPasswordModal}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Şifre Sıfırlama</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="E-posta adresinizi girin"
+              value={resetEmail}
+              onChangeText={setResetEmail}
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsForgotPasswordVisible(false)}
+              >
+                <Text style={styles.buttonText}>İptal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.sendButton]}
+                onPress={handleForgotPassword}
+              >
+                <Text style={styles.buttonText}>Gönder</Text>
+              </TouchableOpacity>
             </View>
-        )
-    }
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
 }
 
-export default LogIn
-
 const styles = StyleSheet.create({
-   container: {
-      paddingTop: 23
-   },
-   input: {
-      margin: 15,
-      height: 40,
-      borderColor: '#7a42f4',
-      borderWidth: 1
-   },
-   submitButton: {
-      backgroundColor: '#7a42f4',
-      padding: 10,
-      margin: 15,
-      height: 40,
-   },
-   submitButtonText:{
-      color: 'white'
-   }
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 100,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logoImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+  },
+  formContainer: {
+    padding: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+  },
+  loginButton: {
+    backgroundColor: '#089CFF',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  guestButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  guestButtonText: {
+    color: '#666',
+    fontSize: 16,
+  },
+  signupLink: {
+    alignItems: 'center',
+  },
+  signupText: {
+    color: '#089CFF',
+    fontSize: 16,
+  },
+  forgotPasswordLink: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  forgotPasswordText: {
+    color: '#089CFF',
+    fontSize: 14,
+  },
+  forgotPasswordModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 5,
+    width: '45%',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+  },
+  sendButton: {
+    backgroundColor: '#089CFF',
+  },
+  passwordVisibilityButton: {
+    padding: 10,
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+  },
+});
